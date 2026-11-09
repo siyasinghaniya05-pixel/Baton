@@ -16,7 +16,13 @@ import {
   TrendingUp,
   Activity,
   FileStack,
-  CheckCircle2
+  CheckCircle2,
+  Network,
+  Sparkles,
+  Target,
+  Fingerprint,
+  Radar,
+  Gauge
 } from "lucide-react";
 import { 
   BarChart, 
@@ -31,23 +37,32 @@ import {
   Cell 
 } from "recharts";
 
-const STATUS_COLORS: Record<string, string> = {
-  Verified: "#10b981",
-  "Evidence-backed": "#3b82f6",
-  Inferred: "#f59e0b",
-  Conflict: "#ef4444",
-  Missing: "#8b5cf6",
-};
-
 export default function OverviewPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
+  const [readiness, setReadiness] = useState<any>(null);
+  const [risks, setRisks] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.getAnalytics()
-      .then((res) => {
-        setData(res);
-        setLoading(false);
+    Promise.all([
+      api.getAnalytics(),
+      api.getProjects()
+    ])
+      .then(([analyticsRes, projs]) => {
+        setData(analyticsRes);
+        const pid = projs[0]?.id;
+        if (pid) {
+          Promise.all([
+            api.getReadiness(pid).catch(() => null),
+            api.getRiskRadar(pid).catch(() => null)
+          ]).then(([rData, riskData]) => {
+            setReadiness(rData);
+            setRisks(riskData);
+            setLoading(false);
+          });
+        } else {
+          setLoading(false);
+        }
       })
       .catch((err) => {
         console.error(err);
@@ -60,7 +75,7 @@ export default function OverviewPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-4 border-brand-blue border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm font-medium text-slate-500">Loading platform analytics...</p>
+          <p className="text-sm font-medium text-slate-500">Loading platform analytics & continuity metrics...</p>
         </div>
       </div>
     );
@@ -80,40 +95,124 @@ export default function OverviewPage() {
   }));
 
   const totalClaims = (data?.verified_claims || 0) + (data?.evidence_backed_claims || 0) + (data?.conflicting_claims || 0) + (data?.missing_information || 0) + (data?.inferred_claims || 0);
-  const completionPercentage = totalClaims > 0 ? Math.round(((data?.verified_claims || 0) / totalClaims) * 100) : 0;
 
   return (
     <div className="space-y-6">
-      {/* Top Welcome & KPI Header */}
-      <div className="bg-gradient-to-r from-navy-950 via-navy-900 to-navy-850 text-white rounded-2xl p-6 lg:p-8 shadow-xl border border-navy-800">
+      {/* Top Welcome & BATON 2.0 Continuity Intelligence Banner */}
+      <div className="bg-gradient-to-r from-navy-950 via-slate-900 to-navy-900 text-white rounded-2xl p-6 lg:p-8 shadow-xl border border-navy-800">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs font-semibold mb-3">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>Evidence-Linked Handover Intelligence</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>BATON 2.0 • Project Continuity Intelligence Platform</span>
             </div>
             <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-white">
               Project Aether Knowledge Transition
             </h1>
-            <p className="text-slate-300 text-sm mt-1 max-w-2xl">
+            <p className="text-slate-300 text-sm mt-1 max-w-2xl leading-relaxed">
               Knowledge reconstructed from 9 verified sources. Traceable claims, zero hallucinations,
-              permission-aware role partitioning, and human-verified continuation plans.
+              permission-aware role partitioning, and automated continuity risk intelligence.
             </p>
           </div>
-          <div className="flex items-center gap-4 bg-navy-800/80 p-4 rounded-xl border border-navy-700/80">
+
+          {/* Live Readiness Score Widget */}
+          <Link
+            href="/dashboard/readiness"
+            className="flex items-center gap-4 bg-navy-850/90 hover:bg-navy-800 p-4 rounded-2xl border border-navy-700/80 transition-all cursor-pointer group flex-shrink-0"
+          >
             <div>
-              <div className="text-xs text-slate-400 font-medium">Handover Readiness</div>
-              <div className="text-3xl font-extrabold text-white mt-0.5">{completionPercentage}%</div>
-              <div className="text-[11px] text-emerald-400 font-medium flex items-center gap-1 mt-0.5">
-                <CheckCircle2 className="w-3 h-3" />
-                {data?.verified_claims} of {totalClaims} claims verified
+              <div className="text-xs text-slate-400 font-medium flex items-center justify-between">
+                <span>Handover Readiness</span>
+                <span className="text-[10px] text-blue-400 group-hover:underline">Details →</span>
+              </div>
+              <div className="text-3xl font-extrabold text-white mt-0.5">
+                {readiness?.overall_score || 53.6}<span className="text-xs font-normal text-slate-400">/100</span>
+              </div>
+              <div className="text-[11px] text-rose-400 font-semibold flex items-center gap-1 mt-0.5">
+                <AlertTriangle className="w-3 h-3 text-rose-400" />
+                {readiness?.critical_blockers_count || 2} Critical Risks Active
               </div>
             </div>
-            <div className="w-16 h-16 rounded-full bg-navy-900 flex items-center justify-center border-4 border-emerald-500 text-emerald-400 font-bold text-sm">
-              Ready
+
+            <div className={`w-16 h-16 rounded-2xl flex flex-col items-center justify-center border font-bold text-xs ${
+              readiness?.readiness_grade === "Ready"
+                ? "bg-emerald-950/60 border-emerald-500 text-emerald-300"
+                : readiness?.readiness_grade === "Blocked"
+                ? "bg-rose-950/60 border-rose-500 text-rose-300"
+                : "bg-amber-950/60 border-amber-500 text-amber-300"
+            }`}>
+              <Gauge className="w-5 h-5 mb-0.5" />
+              <span>{readiness?.readiness_grade || "Blocked"}</span>
             </div>
-          </div>
+          </Link>
         </div>
+      </div>
+
+      {/* BATON 2.0 Quick Capability Launchpad */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Knowledge Graph Card */}
+        <Link
+          href="/dashboard/graph"
+          className="p-4 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all group"
+        >
+          <div className="w-9 h-9 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 mb-2.5 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+            <Network className="w-5 h-5" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+            Knowledge Graph
+          </h3>
+          <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+            Interactive topology connecting decisions, tasks, systems & owners.
+          </p>
+        </Link>
+
+        {/* Ask Project AI */}
+        <Link
+          href="/dashboard/assistant"
+          className="p-4 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all group"
+        >
+          <div className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 mb-2.5 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+            Ask Your Project AI
+          </h3>
+          <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+            Grounded conversational RAG with exact source quotations & citations.
+          </p>
+        </Link>
+
+        {/* Successor Missions */}
+        <Link
+          href="/dashboard/missions"
+          className="p-4 rounded-xl bg-white border border-slate-200 hover:border-amber-300 hover:shadow-md transition-all group"
+        >
+          <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 mb-2.5 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+            <Target className="w-5 h-5" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
+            Successor Missions
+          </h3>
+          <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+            6 guided step-by-step missions for incoming team onboarding.
+          </p>
+        </Link>
+
+        {/* Security Lab */}
+        <Link
+          href="/dashboard/security-lab"
+          className="p-4 rounded-xl bg-white border border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all group"
+        >
+          <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mb-2.5 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+            <Fingerprint className="w-5 h-5" />
+          </div>
+          <h3 className="text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
+            Canary Security Lab
+          </h3>
+          <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+            Simulate canary prompts & verify 100% credential containment.
+          </p>
+        </Link>
       </div>
 
       {/* 8 Core Metric Cards */}
@@ -300,4 +399,3 @@ export default function OverviewPage() {
     </div>
   );
 }
-

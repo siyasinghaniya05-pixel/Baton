@@ -1,9 +1,9 @@
-# BATON – Evidence-Linked Knowledge Handover Platform
+# BATON 2.0 – Project Continuity Intelligence Platform
 > **Tagline:** *Pass the project, not just the files.*
 
-BATON is a production-grade, permission-aware, evidence-linked knowledge handover platform that prevents critical organizational, engineering, and club context from leaving when team members exit.
+BATON 2.0 is a production-grade, permission-aware, evidence-linked **Project Continuity Intelligence Platform** designed to prevent critical organizational, engineering, architectural, and operational knowledge from leaving when team members exit.
 
-Unlike conventional document summarizers that hallucinate facts and flatten nuances, BATON reconstructs project knowledge into independent, verifiable claims where **every single claim is grounded in verbatim citations from authorized sources**.
+Unlike conventional document summarizers that hallucinate facts and flatten nuances, BATON 2.0 reconstructs project knowledge into independent, verifiable claims where **every single claim is grounded in verbatim citations from authorized sources**.
 
 ---
 
@@ -17,147 +17,98 @@ flowchart TD
         A3[Task Board CSV/JSON] --> P
         A4[Exported Chat Transcripts] --> P
         P --> Chunk[Deterministic Chunker]
-        Chunk --> Privacy[Presidio PII & Canary Secret Scanner]
+        Chunk --> Privacy[Microsoft Presidio PII & Canary Scanner]
     end
 
-    subgraph CoreEngine ["2. AI Reconstruction & Claim Ledger"]
+    subgraph CoreEngine ["2. AI Continuity Intelligence Engine"]
         Privacy --> RedactedChunks[Redacted Source Chunks]
         RedactedChunks --> LLM[Swappable LLM Adapter: Gemini / Claude / Deterministic]
         LLM --> Extraction[Decisions, Ownership, PRs, Blockers, Risks, Timeline]
         Extraction --> Verifier[Deterministic Quotation Verifier & Support Checker]
         Verifier --> Ledger[(PostgreSQL 16: Claim Ledger)]
-        Ledger --> Gaps[Gap Interview Engine]
+        Ledger --> GraphEngine[Interactive Knowledge Graph Engine]
+        Ledger --> Archaeology[Decision Archaeology Engine]
+        Ledger --> RadarEngine[8-Category Project Risk Radar]
+        Ledger --> ReadinessEngine[0-100 Weighted Handover Readiness Engine]
+        Ledger --> DriftEngine[Temporal Knowledge Drift Detector]
+        Ledger --> BusFactorEngine[Bus-Factor & Single-Person Silo Detector]
     end
 
-    subgraph Governance ["3. Human Review & Role Enforcement"]
+    subgraph Defense ["3. Zero-Hallucination Assistant & Active Defense Lab"]
+        RedactedChunks --> AssistantRAG[Ask Your Project: Permission-Aware RAG]
+        AssistantRAG --> GroundedResp[Grounded Citations & Uncertainty Labels]
+        AssistantRAG --> CanaryShield[Canary Secret Shield & Leak Refusal]
+        CanaryShield --> SecurityLab[Canary Penetration Test Simulator]
+    end
+
+    subgraph Onboarding ["4. Successor Experience & Governance"]
+        ReadinessEngine --> Missions[Guided Successor Mission Mode: 6 Steps]
+        Ledger --> LivingRunbooks[Living Runbooks: Setup, Deployment, Disaster Recovery]
         Ledger --> ReviewWorkspace[Human Review Workspace]
-        ReviewWorkspace --> Audit[(Append-Only Audit Log)]
+        ReviewWorkspace --> CollabRoom[Multi-Role Collaboration Room]
         ReviewWorkspace --> HandoverCompiler[Role-Partitioned Handover Compiler]
-        Gaps --> LeaverUI[Interactive Gap Interview UI]
-    end
-
-    subgraph Output ["4. Consumer Views & Continuation"]
-        HandoverCompiler --> V1[Successor Handover + Day 1 / Week 1 / Day 30 Plan]
-        HandoverCompiler --> V2[Lead / Reviewer Detailed Handover]
-        HandoverCompiler --> V3[Restricted Viewer Sanitized View]
-        V1 --> Quiz[Comprehension Quiz & SHA-256 Receipt Hash]
+        HandoverCompiler --> Quiz[Comprehension Quiz & SHA-256 Receipt Hash]
     end
 ```
 
 ---
 
-## 2. Core Guarantees
+## 2. BATON 2.0 Core Modules & Capabilities
 
-1. **Evidence-Linked Grounding**:
-   - Every claim is tied to an exact source quote, source file, line number, or page span.
-   - Deterministic verification strictly checks if the quote exists in the source chunk; invalid quotes are automatically downgraded.
-2. **Preserves Conflicts and Information Gaps**:
-   - Competing decisions (e.g. ROS1 vs ROS2, conflicting deadlines) are never silently averaged; they remain flagged as `Conflict`.
-   - Missing information is preserved as an explicit information `Gap`.
-3. **Role-Based Permission Partitioning**:
-   - Handover views for Successor, Lead, and Restricted Viewers are generated **strictly from permitted evidence**.
-   - Claims inherit the strictest sensitivity label among supporting evidence (`Public`, `Internal`, `Confidential`, `Restricted`).
-4. **Canary Secret Shielding**:
-   - Automatic redaction of canary tokens, API keys, and PII before AI processing.
-   - Restricted items appear as `🔒 [RESTRICTED ITEM]` placeholders in unprivileged role views.
-5. **Human Approval Gate**:
-   - Handover versions require explicit human reviewer sign-off before publication.
-   - All reviewer actions are committed to an append-only audit trail.
-
----
-
-## 3. Technology Stack
-
-- **Frontend**: Next.js 14+ (App Router), React, TypeScript, Tailwind CSS, Lucide icons, Recharts.
-- **Backend**: Python FastAPI, Pydantic v2 validation, SQLAlchemy ORM.
-- **Database**: PostgreSQL 16 with Row-Level Security policies.
-- **Security & Privacy**: bcrypt hashing, JWT authentication, Presidio PII pattern recognition, canary secret entropy scanning.
-- **Testing**: Pytest automated test suite (quotation verification, leak tests, role permissions).
+| Module | Purpose | Live Route |
+| :--- | :--- | :--- |
+| **Project Knowledge Graph** | Interactive SVG topology mapping team members, decisions, tasks, systems, files, and dependencies with zoom/pan and evidence drawer. | `/dashboard/graph` |
+| **Decision Archaeology** | Reconstructs what was decided, participants, alternatives considered, concerns raised, and reversal status; missing reasoning is explicitly flagged. | `/dashboard/decisions` |
+| **Project Risk Radar** | 8-dimension risk heatmap (knowledge concentration, ownership, deadline, dependency, docs, security, debt, unresolved decisions) with mitigations. | `/dashboard/risks` |
+| **Handover Readiness Score** | Deterministic 0–100 score across 6 weighted pillars with transparent point deduction breakdowns and concrete remediation checklist. | `/dashboard/readiness` |
+| **Ask Your Project AI** | Permission-filtered conversational assistant for incoming successors grounded strictly in verbatim citations; refuses canary leaks. | `/dashboard/assistant` |
+| **Successor Mission Mode** | 6 interactive onboarding missions (Architecture, Dependencies, Local Setup, Simulation, Blocker Resolution, Production Deployment). | `/dashboard/missions` |
+| **Living Runbooks** | Dynamic operational runbooks (Setup, Deployment, Troubleshooting, Recurring, Emergency Disaster Recovery) with runnable snippets & reviewer sign-off. | `/dashboard/runbooks` |
+| **Bus-Factor Intelligence** | Identifies single-person bottlenecks (Bus Factor = 1), zero-backup components, and urgency handoff action plans. | `/dashboard/bus-factor` |
+| **Knowledge Drift Detector** | Temporal divergence analysis comparing baseline sources vs current drift across decisions, scripts, and ownership. | `/dashboard/drift` |
+| **Security & Canary Lab** | Automated penetration testing simulator evaluating direct retrieval, paraphrasing, and RAG injection attacks across user roles (100% containment). | `/dashboard/security-lab` |
+| **Collaboration Room** | Multi-role deliberation thread connecting outgoing leads, technical reviewers, and incoming successors. | `/dashboard/collaboration` |
+| **Claim Ledger & Split Evidence** | Verified independent knowledge claims with side-by-side verbatim citation highlighting. | `/dashboard/claims` & `/dashboard/evidence` |
+| **Role-Partitioned Handover** | Successor, Reviewer, and Restricted Viewer views with 30-day continuation plan and cryptographic receipt. | `/dashboard/handovers` |
 
 ---
 
-## 4. User Roles & Clearance Matrix
+## 3. Handover Readiness Scoring Formula
 
-| Role | Default Clearance | Responsibilities |
-|---|---|---|
-| **Admin** | `Restricted` (Full) | Creates projects, uploads sources, manages permissions, publishes handovers. |
-| **Leaver** | `Confidential` | Completes targeted AI Gap Interview; answers convert to labelled evidence. |
-| **Reviewer** | `Restricted` | Accepts, edits, or rejects claims; grants human approval to publish handovers. |
-| **Successor** | `Internal` | Receives approved handover, executes Day 1/Week 1/Day 30 plan, passes quiz. |
-| **Restricted Viewer** | `Public` | Sees only public information; sensitive and confidential items are masked. |
+The transparent 0–100 score is computed from actual database records:
 
----
+$$\text{Readiness Score} = S_{\text{evidence}} (25\%) + S_{\text{ownership}} (20\%) + S_{\text{conflict}} (15\%) + S_{\text{dependency}} (15\%) + S_{\text{access}} (15\%) + S_{\text{review}} (10\%)$$
 
-## 5. Demonstration Dataset: Project Aether
-
-BATON comes preloaded with **Project Aether – Autonomous Robotics Platform** (fictional robotics club project):
-- 1 repository export (`repository_export_README.md`)
-- 6 meeting notes (Kickoff, Sensor Selection, ROS2 Migration, Schedule, Infrastructure, Handover Prep)
-- 1 task board CSV (`Aether_Sprint_Taskboard.csv`)
-- 1 chat export with ~300 simulated Discord messages
-- 15 planted decisions, 3 conflicts (ROS1 vs ROS2, demo date, bracket fabrication), 4 gaps (missing cloud root MFA, calibration ownership), 3 canary secrets.
+> [!IMPORTANT]
+> **Safety Rule:** A high numerical score never implies false certainty. Active critical blockers or unresolved contradictions automatically set the project status to **Blocked** or **At Risk**, preventing unapproved sign-off.
 
 ---
 
-## 6. Local Setup Instructions
+## 4. Test Credentials (Synthetic Context: Project Aether)
 
-### Prerequisites
-- Python 3.11+
-- Node.js 18+ & npm
-- PostgreSQL 16
-
-### 1. Database & Backend Setup
-```bash
-# Clone the repository
-git clone https://github.com/your-org/baton.git
-cd baton/backend
-
-# Create virtual environment and install dependencies
-python -m pip install -r requirements.txt
-
-# Start backend server
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
-*The database tables and Project Aether demonstration dataset are automatically seeded on startup.*
-
-### 2. Frontend Setup
-```bash
-cd ../frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-# Or build and start production server
-npm run build
-npm start
-```
-*Frontend runs on `http://localhost:3000` and proxies requests to `http://localhost:8000/api/v1`.*
-
-### 3. Docker Compose Setup (One-Command)
-```bash
-docker-compose up --build
-```
+| Role | Email | Password | Clearance Level |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin@baton.local` | `AdminPass123!` | Public, Internal, Confidential, Restricted |
+| **Outgoing Leaver** | `alex.leaver@baton.local` | `LeaverPass123!` | Public, Internal, Confidential, Restricted |
+| **Tech Reviewer** | `elena.reviewer@baton.local` | `ReviewerPass123!` | Public, Internal, Confidential, Restricted |
+| **Successor** | `sam.successor@baton.local` | `SuccessorPass123!` | Public, Internal, Confidential |
+| **Restricted Viewer** | `guest.viewer@baton.local` | `GuestPass123!` | Public, Internal |
 
 ---
 
-## 7. Running Automated Tests
+## 5. Verification & Testing
 
-Run the test suite to verify citation checking and canary leak prevention:
-```bash
+### Running Backend Pytest Suite
+```powershell
 cd backend
-python -m pytest tests/
+python -m pytest tests
 ```
-Output:
-```text
-======================== 4 passed in 2.59s ========================
+*Result: 11 passed (Canary Leak Prevention, Citation Verification, Handover Scoring, Knowledge Graph, Assistant RAG, Drift Detector, Security Simulator).*
+
+### Running Production Frontend
+```powershell
+cd frontend
+npm run build
+npm run start -- -p 3000
 ```
-
----
-
-## 8. License & Attribution
-
-Designed and engineered for Advanced Knowledge Handover under Apache 2.0.
-*All demonstration datasets are strictly synthetic and created for evaluation.*
-
+Visit `http://localhost:3000` to launch the platform.

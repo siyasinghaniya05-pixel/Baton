@@ -14,15 +14,27 @@ from app.api.v1.timeline import router as timeline_router
 from app.api.v1.audit import router as audit_router
 from app.api.v1.analytics import router as analytics_router
 from app.api.v1.seed import router as seed_router
+
+# BATON 2.0 Continuity Intelligence routers
+from app.api.v1.continuity import router as continuity_router
+from app.api.v1.graph import router as graph_router
+from app.api.v1.decisions import router as decisions_router
+from app.api.v1.assistant import router as assistant_router
+from app.api.v1.missions import router as missions_router
+from app.api.v1.runbooks import router as runbooks_router
+from app.api.v1.drift import router as drift_router
+from app.api.v1.security_lab import router as security_lab_router
+from app.api.v1.collaboration import router as collaboration_router
+
 from app.services.seed_data import seed_database
 
 # Create all database tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title=f"{settings.PROJECT_NAME} API",
-    description="Evidence-Linked Knowledge Handover Platform – Pass the project, not just the files.",
-    version=settings.VERSION,
+    title=f"{settings.PROJECT_NAME} 2.0 API",
+    description="Project Continuity Intelligence Platform – Pass the project, not just the files.",
+    version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -51,6 +63,17 @@ app.include_router(audit_router, prefix=prefix)
 app.include_router(analytics_router, prefix=prefix)
 app.include_router(seed_router, prefix=prefix)
 
+# Register BATON 2.0 routers
+app.include_router(continuity_router, prefix=prefix)
+app.include_router(graph_router, prefix=prefix)
+app.include_router(decisions_router, prefix=prefix)
+app.include_router(assistant_router, prefix=prefix)
+app.include_router(missions_router, prefix=prefix)
+app.include_router(runbooks_router, prefix=prefix)
+app.include_router(drift_router, prefix=prefix)
+app.include_router(security_lab_router, prefix=prefix)
+app.include_router(collaboration_router, prefix=prefix)
+
 @app.on_event("startup")
 def on_startup():
     db = SessionLocal()
@@ -65,12 +88,12 @@ def root():
     return {
         "name": settings.PROJECT_NAME,
         "tagline": "Pass the project, not just the files.",
-        "version": settings.VERSION,
+        "version": "2.0.0",
+        "edition": "Continuity Intelligence Platform",
         "status": "online",
         "docs": "/docs"
     }
 
 @app.get("/health")
 def health():
-    return {"status": "healthy"}
-
+    return {"status": "healthy", "version": "2.0.0"}

@@ -10,6 +10,11 @@ from app.models.handover import (
 )
 from app.models.audit import AuditLog
 from app.models.access import AccessRequest
+from app.models.continuity import (
+    RiskFinding, RiskSeverity, RiskCategory, DecisionRecord,
+    BusFactorItem, LivingRunbook, SuccessorMission, CollaborationComment,
+    SourceReliabilityScore
+)
 
 __all__ = [
     "Base", "User", "UserRole", "Project", "ProjectMember", "SensitivityLevel",
@@ -17,6 +22,8 @@ __all__ = [
     "ClaimStatus", "ClaimCategory", "ReviewState", "GapQuestion", "GapAnswer", 
     "GapStatus", "GapType", "HandoverVersion", "HandoverView", "ContinuationAction", 
     "Acknowledgement", "ComprehensionCheck", "HandoverStatus", "Timeframe",
-    "AuditLog", "AccessRequest"
+    "AuditLog", "AccessRequest",
+    "RiskFinding", "RiskSeverity", "RiskCategory", "DecisionRecord",
+    "BusFactorItem", "LivingRunbook", "SuccessorMission", "CollaborationComment",
+    "SourceReliabilityScore"
 ]
-
