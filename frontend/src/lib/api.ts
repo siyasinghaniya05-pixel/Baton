@@ -52,6 +52,72 @@ class ApiClient {
     return response.json();
   }
 
+  async register(fullName: string, email: string, password: string, role?: UserRole) {
+    return this.request<any>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({ full_name: fullName, email, password, role }),
+    });
+  }
+
+  async forgotPassword(email: string) {
+    return this.request<any>("/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    return this.request<any>("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ token, new_password: newPassword }),
+    });
+  }
+
+  async verifyEmail(token: string) {
+    return this.request<any>("/auth/verify-email", {
+      method: "POST",
+      body: JSON.stringify({ token }),
+    });
+  }
+
+  async logout() {
+    try {
+      await this.request<any>("/auth/logout", { method: "POST" });
+    } catch {
+      // Ignore network errors on logout
+    }
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("baton_token");
+      localStorage.removeItem("baton_user");
+    }
+  }
+
+  async revokeAllSessions() {
+    return this.request<any>("/auth/revoke-all-sessions", { method: "POST" });
+  }
+
+  async updateProfile(fullName: string) {
+    return this.request<any>("/auth/profile", {
+      method: "PATCH",
+      body: JSON.stringify({ full_name: fullName }),
+    });
+  }
+
+  async getMe() {
+    return this.request<any>("/auth/me");
+  }
+
+  async getUsersList() {
+    return this.request<any[]>("/auth/users");
+  }
+
+  async changeUserRole(userId: string, newRole: string) {
+    return this.request<any>(`/auth/users/${userId}/role`, {
+      method: "PATCH",
+      body: JSON.stringify({ new_role: newRole }),
+    });
+  }
+
   // Auth Endpoints
   async login(email: string, password: string) {
     const data = await this.request<{
@@ -100,13 +166,6 @@ class ApiClient {
       }
     }
     return null;
-  }
-
-  logout() {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("baton_token");
-      localStorage.removeItem("baton_user");
-    }
   }
 
   // Analytics
@@ -325,6 +384,26 @@ class ApiClient {
     return this.request<any>(`/projects/${projectId}/collaboration/comments`, {
       method: "POST",
       body: JSON.stringify(payload),
+    });
+  }
+
+  async getClaimVerificationDetail(claimId: string) {
+    return this.request<any>(`/claims/${claimId}/verify`);
+  }
+
+  async reverifyClaim(claimId: string) {
+    return this.request<any>(`/claims/${claimId}/reverify`, {
+      method: "POST",
+    });
+  }
+
+  async getSecurityHealth() {
+    return this.request<any>("/security/health");
+  }
+
+  async runSecurityTestSuite() {
+    return this.request<any>("/security/run-tests", {
+      method: "POST",
     });
   }
 

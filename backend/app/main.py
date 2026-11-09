@@ -25,6 +25,7 @@ from app.api.v1.runbooks import router as runbooks_router
 from app.api.v1.drift import router as drift_router
 from app.api.v1.security_lab import router as security_lab_router
 from app.api.v1.collaboration import router as collaboration_router
+from app.api.v1.security import router as security_router
 
 from app.services.seed_data import seed_database
 
@@ -73,6 +74,7 @@ app.include_router(runbooks_router, prefix=prefix)
 app.include_router(drift_router, prefix=prefix)
 app.include_router(security_lab_router, prefix=prefix)
 app.include_router(collaboration_router, prefix=prefix)
+app.include_router(security_router, prefix=prefix)
 
 @app.on_event("startup")
 def on_startup():

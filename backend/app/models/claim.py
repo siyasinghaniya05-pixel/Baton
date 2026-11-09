@@ -11,6 +11,7 @@ class ClaimStatus(str, enum.Enum):
     INFERRED = "Inferred"
     CONFLICT = "Conflict"
     MISSING = "Missing"
+    UNVERIFIED = "Unverified"
 
 class ClaimCategory(str, enum.Enum):
     DECISION = "Decision"
@@ -51,6 +52,10 @@ class Claim(Base):
     reviewer_notes = Column(Text, nullable=True)
     conflict_claim_id = Column(String(36), nullable=True)  # Links to opposing conflicting claim
     event_timestamp = Column(DateTime, nullable=True)  # For timeline chronological sorting
+    
+    # Multi-Stage Verification Pipeline Report
+    verification_report = Column(JSON, default=dict)
+
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
@@ -71,4 +76,3 @@ class EvidenceSpan(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     claim = relationship("Claim", back_populates="evidence_spans")
-

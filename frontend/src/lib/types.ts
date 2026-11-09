@@ -1,6 +1,6 @@
 export type UserRole = "admin" | "leaver" | "reviewer" | "successor" | "restricted_viewer";
 export type SensitivityLevel = "public" | "internal" | "confidential" | "restricted";
-export type ClaimStatus = "Verified" | "Evidence-backed" | "Inferred" | "Conflict" | "Missing";
+export type ClaimStatus = "Verified" | "Evidence-backed" | "Inferred" | "Conflict" | "Missing" | "Unverified";
 export type ClaimCategory = 
   | "Decision"
   | "Decision Reasoning"

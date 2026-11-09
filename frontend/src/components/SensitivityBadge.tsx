@@ -2,8 +2,9 @@ import React from "react";
 import { SensitivityLevel } from "@/lib/types";
 import { Globe, Lock, ShieldAlert, KeyRound } from "lucide-react";
 
-export function SensitivityBadge({ level }: { level: SensitivityLevel }) {
-  switch (level) {
+export function SensitivityBadge({ level, sensitivity }: { level?: SensitivityLevel; sensitivity?: SensitivityLevel }) {
+  const effectiveLevel = level || sensitivity;
+  switch (effectiveLevel) {
     case "public":
       return (
         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
@@ -36,4 +37,3 @@ export function SensitivityBadge({ level }: { level: SensitivityLevel }) {
       return null;
   }
 }
-

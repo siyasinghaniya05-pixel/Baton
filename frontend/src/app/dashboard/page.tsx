@@ -9,33 +9,15 @@ import {
   FileSpreadsheet, 
   CheckSquare, 
   AlertTriangle, 
-  HelpCircle, 
   ShieldCheck, 
   Layers, 
   ArrowRight,
-  TrendingUp,
   Activity,
-  FileStack,
   CheckCircle2,
-  Network,
-  Sparkles,
-  Target,
-  Fingerprint,
-  Radar,
-  Gauge
+  Clock,
+  Compass,
+  FileText
 } from "lucide-react";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer, 
-  PieChart, 
-  Pie, 
-  Cell 
-} from "recharts";
 
 export default function OverviewPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
@@ -74,324 +56,231 @@ export default function OverviewPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-4 border-brand-blue border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm font-medium text-slate-500">Loading platform analytics & continuity metrics...</p>
+          <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs font-medium text-slate-500">Loading platform overview...</p>
         </div>
       </div>
     );
   }
 
-  const claimStatusData = [
-    { name: "Verified", value: data?.verified_claims || 0, color: "#10b981" },
-    { name: "Evidence-backed", value: data?.evidence_backed_claims || 0, color: "#3b82f6" },
-    { name: "Conflicts", value: data?.conflicting_claims || 0, color: "#ef4444" },
-    { name: "Missing Gaps", value: data?.missing_information || 0, color: "#8b5cf6" },
-    { name: "Inferred", value: data?.inferred_claims || 0, color: "#f59e0b" },
-  ];
-
-  const categoryBarData = Object.entries(data?.category_distribution || {}).map(([key, val]) => ({
-    name: key.replace("Decision Reasoning", "Reasoning").replace("Timeline Milestone", "Milestone").replace("Recurring Problem", "Recurring"),
-    count: val,
-  }));
-
   const totalClaims = (data?.verified_claims || 0) + (data?.evidence_backed_claims || 0) + (data?.conflicting_claims || 0) + (data?.missing_information || 0) + (data?.inferred_claims || 0);
+  const coveragePercent = totalClaims > 0 ? Math.round(((data?.verified_claims || 0) / totalClaims) * 100) : 0;
 
   return (
-    <div className="space-y-6">
-      {/* Top Welcome & BATON 2.0 Continuity Intelligence Banner */}
-      <div className="bg-gradient-to-r from-navy-950 via-slate-900 to-navy-900 text-white rounded-2xl p-6 lg:p-8 shadow-xl border border-navy-800">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-400/20 text-blue-300 text-xs font-semibold mb-3">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>BATON 2.0 • Project Continuity Intelligence Platform</span>
-            </div>
-            <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-white">
-              Project Aether Knowledge Transition
-            </h1>
-            <p className="text-slate-300 text-sm mt-1 max-w-2xl leading-relaxed">
-              Knowledge reconstructed from 9 verified sources. Traceable claims, zero hallucinations,
-              permission-aware role partitioning, and automated continuity risk intelligence.
-            </p>
-          </div>
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Executive Handover Overview</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Real-time status of project knowledge continuity, risk mitigation, and verification readiness.
+          </p>
+        </div>
 
-          {/* Live Readiness Score Widget */}
+        <div className="flex items-center gap-2">
           <Link
-            href="/dashboard/readiness"
-            className="flex items-center gap-4 bg-navy-850/90 hover:bg-navy-800 p-4 rounded-2xl border border-navy-700/80 transition-all cursor-pointer group flex-shrink-0"
+            href="/dashboard/handovers"
+            className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-1.5"
           >
-            <div>
-              <div className="text-xs text-slate-400 font-medium flex items-center justify-between">
-                <span>Handover Readiness</span>
-                <span className="text-[10px] text-blue-400 group-hover:underline">Details →</span>
-              </div>
-              <div className="text-3xl font-extrabold text-white mt-0.5">
-                {readiness?.overall_score || 53.6}<span className="text-xs font-normal text-slate-400">/100</span>
-              </div>
-              <div className="text-[11px] text-rose-400 font-semibold flex items-center gap-1 mt-0.5">
-                <AlertTriangle className="w-3 h-3 text-rose-400" />
-                {readiness?.critical_blockers_count || 2} Critical Risks Active
-              </div>
-            </div>
-
-            <div className={`w-16 h-16 rounded-2xl flex flex-col items-center justify-center border font-bold text-xs ${
-              readiness?.readiness_grade === "Ready"
-                ? "bg-emerald-950/60 border-emerald-500 text-emerald-300"
-                : readiness?.readiness_grade === "Blocked"
-                ? "bg-rose-950/60 border-rose-500 text-rose-300"
-                : "bg-amber-950/60 border-amber-500 text-amber-300"
-            }`}>
-              <Gauge className="w-5 h-5 mb-0.5" />
-              <span>{readiness?.readiness_grade || "Blocked"}</span>
-            </div>
+            <span>Handover Center</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>
 
-      {/* BATON 2.0 Quick Capability Launchpad */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {/* Knowledge Graph Card */}
-        <Link
-          href="/dashboard/graph"
-          className="p-4 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all group"
-        >
-          <div className="w-9 h-9 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 mb-2.5 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-            <Network className="w-5 h-5" />
+      {/* Active Project Banner */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+              Active Handover
+            </span>
+            <span className="text-xs text-slate-400">•</span>
+            <span className="text-xs text-slate-500 font-medium">Outgoing: Alex Mercer → Incoming: Sam Taylor</span>
           </div>
-          <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-            Knowledge Graph
-          </h3>
-          <p className="text-[11px] text-slate-500 mt-1 leading-snug">
-            Interactive topology connecting decisions, tasks, systems & owners.
+          <h2 className="text-base font-bold text-slate-900">
+            Project Aether – Autonomous Robotics Platform
+          </h2>
+          <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
+            Autonomous ground vehicle initiative migrating from ROS1 Noetic to ROS2 Humble with Cartographer 3D SLAM.
           </p>
-        </Link>
+        </div>
 
-        {/* Ask Project AI */}
-        <Link
-          href="/dashboard/assistant"
-          className="p-4 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all group"
-        >
-          <div className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 mb-2.5 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-            <Sparkles className="w-5 h-5" />
+        {/* Readiness Score Pill */}
+        <div className="flex items-center gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200 flex-shrink-0">
+          <div className="text-right">
+            <span className="text-[10px] text-slate-400 uppercase font-bold block">Readiness Score</span>
+            <span className="text-2xl font-extrabold text-slate-900">
+              {readiness?.overall_score || 53.6}<span className="text-xs font-normal text-slate-400">/100</span>
+            </span>
           </div>
-          <h3 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-            Ask Your Project AI
-          </h3>
-          <p className="text-[11px] text-slate-500 mt-1 leading-snug">
-            Grounded conversational RAG with exact source quotations & citations.
-          </p>
-        </Link>
-
-        {/* Successor Missions */}
-        <Link
-          href="/dashboard/missions"
-          className="p-4 rounded-xl bg-white border border-slate-200 hover:border-amber-300 hover:shadow-md transition-all group"
-        >
-          <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 mb-2.5 group-hover:bg-amber-600 group-hover:text-white transition-colors">
-            <Target className="w-5 h-5" />
+          <div className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${
+            readiness?.readiness_grade === "Ready"
+              ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+              : readiness?.readiness_grade === "Blocked"
+              ? "bg-rose-50 text-rose-700 border-rose-300"
+              : "bg-amber-50 text-amber-700 border-amber-300"
+          }`}>
+            {readiness?.readiness_grade || "Blocked"}
           </div>
-          <h3 className="text-sm font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
-            Successor Missions
-          </h3>
-          <p className="text-[11px] text-slate-500 mt-1 leading-snug">
-            6 guided step-by-step missions for incoming team onboarding.
-          </p>
-        </Link>
-
-        {/* Security Lab */}
-        <Link
-          href="/dashboard/security-lab"
-          className="p-4 rounded-xl bg-white border border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all group"
-        >
-          <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mb-2.5 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-            <Fingerprint className="w-5 h-5" />
-          </div>
-          <h3 className="text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
-            Canary Security Lab
-          </h3>
-          <p className="text-[11px] text-slate-500 mt-1 leading-snug">
-            Simulate canary prompts & verify 100% credential containment.
-          </p>
-        </Link>
+        </div>
       </div>
 
-      {/* 8 Core Metric Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {/* Total Projects */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs">
+      {/* 4 Primary Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 1. Knowledge Coverage */}
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-semibold uppercase tracking-wider">Total Projects</span>
-            <FolderGit2 className="w-4 h-4 text-brand-blue" />
+            <span className="text-xs font-semibold uppercase tracking-wider">Knowledge Coverage</span>
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-bold text-slate-900 mt-2">{data?.total_projects}</div>
-          <div className="text-xs text-slate-500 mt-1">Active workspaces</div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-2xl font-bold text-slate-900">{coveragePercent}%</span>
+            <span className="text-xs text-slate-500 font-medium">{data?.verified_claims} / {totalClaims} claims</span>
+          </div>
+          <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+            <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: `${coveragePercent}%` }} />
+          </div>
         </div>
 
-        {/* Active Handovers */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs">
+        {/* 2. Critical Risks */}
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-semibold uppercase tracking-wider">Active Handovers</span>
-            <FileSpreadsheet className="w-4 h-4 text-brand-accent" />
+            <span className="text-xs font-semibold uppercase tracking-wider">Critical Risks</span>
+            <AlertTriangle className="w-4 h-4 text-rose-500" />
           </div>
-          <div className="text-2xl font-bold text-slate-900 mt-2">{data?.active_handovers}</div>
-          <div className="text-xs text-slate-500 mt-1">In progress / compilation</div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-2xl font-bold text-rose-600">{risks?.critical_count || 2}</span>
+            <span className="text-xs text-slate-500 font-medium">{risks?.total_risks || 8} total tracked</span>
+          </div>
+          <p className="text-[11px] text-slate-500 truncate">Kafka broker & Vault root token silos</p>
         </div>
 
-        {/* Pending Reviews */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs">
+        {/* 3. Pending Reviews */}
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-slate-400">
             <span className="text-xs font-semibold uppercase tracking-wider">Pending Reviews</span>
             <CheckSquare className="w-4 h-4 text-amber-500" />
           </div>
-          <div className="text-2xl font-bold text-amber-600 mt-2">{data?.pending_reviews}</div>
-          <div className="text-xs text-slate-500 mt-1">Awaiting reviewer sign-off</div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-2xl font-bold text-amber-600">{data?.pending_reviews || 0}</span>
+            <span className="text-xs text-slate-500 font-medium">Awaiting reviewer</span>
+          </div>
+          <p className="text-[11px] text-slate-500 truncate">Requires Elena Rostova sign-off</p>
         </div>
 
-        {/* Conflicting Claims */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs">
+        {/* 4. Active Handovers */}
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-semibold uppercase tracking-wider">Conflicts Detected</span>
-            <AlertTriangle className="w-4 h-4 text-rose-500" />
+            <span className="text-xs font-semibold uppercase tracking-wider">Active Handovers</span>
+            <FileSpreadsheet className="w-4 h-4 text-blue-600" />
           </div>
-          <div className="text-2xl font-bold text-rose-600 mt-2">{data?.conflicting_claims}</div>
-          <div className="text-xs text-rose-500 font-medium mt-1">Opposing evidence logged</div>
-        </div>
-
-        {/* Missing Information Gaps */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-semibold uppercase tracking-wider">Information Gaps</span>
-            <HelpCircle className="w-4 h-4 text-purple-500" />
+          <div className="flex items-baseline justify-between">
+            <span className="text-2xl font-bold text-slate-900">{data?.active_handovers || 1}</span>
+            <span className="text-xs text-emerald-600 font-medium">Version 1.0</span>
           </div>
-          <div className="text-2xl font-bold text-purple-600 mt-2">{data?.missing_information}</div>
-          <div className="text-xs text-slate-500 mt-1">In Gap Interview queue</div>
-        </div>
-
-        {/* Verified Claims */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-semibold uppercase tracking-wider">Verified Claims</span>
-            <ShieldCheck className="w-4 h-4 text-emerald-500" />
-          </div>
-          <div className="text-2xl font-bold text-emerald-600 mt-2">{data?.verified_claims}</div>
-          <div className="text-xs text-slate-500 mt-1">100% quotation grounded</div>
-        </div>
-
-        {/* Total Sources Ingested */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-semibold uppercase tracking-wider">Sources Ingested</span>
-            <FileStack className="w-4 h-4 text-blue-500" />
-          </div>
-          <div className="text-2xl font-bold text-slate-900 mt-2">{data?.total_sources}</div>
-          <div className="text-xs text-slate-500 mt-1">Repo, Notes, Board, Chat</div>
-        </div>
-
-        {/* Total Reconstructed Claims */}
-        <div className="bg-white p-5 rounded-xl border border-slate-200/80 shadow-xs">
-          <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-semibold uppercase tracking-wider">Total Claims</span>
-            <Layers className="w-4 h-4 text-indigo-500" />
-          </div>
-          <div className="text-2xl font-bold text-slate-900 mt-2">{totalClaims}</div>
-          <div className="text-xs text-slate-500 mt-1">Independent ledger records</div>
+          <p className="text-[11px] text-slate-500 truncate">Role views generated & secured</p>
         </div>
       </div>
 
-      {/* Analytics Visualizations Grid */}
+      {/* Two Column Layout: Readiness Breakdown & Critical Blockers */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: Claim Status Distribution (Pie / Legend) */}
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs">
-          <div className="flex items-center justify-between mb-4">
+        {/* Left: 6-Pillar Readiness Score Breakdown */}
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="font-bold text-slate-900">Claim Grounding Status</h3>
-              <p className="text-xs text-slate-500">Distribution across verification categories</p>
+              <h3 className="text-sm font-bold text-slate-900">Handover Readiness Pillars</h3>
+              <p className="text-xs text-slate-500">Deterministic 6-factor continuity evaluation</p>
             </div>
-            <Link href="/dashboard/claims" className="text-xs font-semibold text-brand-blue flex items-center gap-1 hover:underline">
-              View Ledger <ArrowRight className="w-3.5 h-3.5" />
+            <Link href="/dashboard/handovers" className="text-xs text-blue-600 hover:underline font-medium">
+              View Handover →
             </Link>
           </div>
-          <div className="h-64 flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={claimStatusData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={55}
-                  outerRadius={85}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  {claimStatusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => [`${value} Claims`, "Count"]} />
-              </PieChart>
-            </ResponsiveContainer>
+
+          <div className="space-y-3">
+            {readiness?.categories?.map((cat: any, idx: number) => {
+              const pct = Math.round((cat.score / cat.max_score) * 100);
+              return (
+                <div key={idx} className="space-y-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-slate-700">{cat.category}</span>
+                    <span className="font-semibold text-slate-900">
+                      {cat.score} / {cat.max_score} <span className="text-slate-400 font-normal">({pct}%)</span>
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className={`h-1.5 rounded-full ${pct >= 80 ? "bg-emerald-500" : pct >= 60 ? "bg-blue-500" : "bg-amber-500"}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 border-t border-slate-100">
-            {claimStatusData.map((s) => (
-              <div key={s.name} className="flex items-center gap-2 text-xs">
-                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.color }} />
-                <span className="text-slate-600">{s.name}:</span>
-                <span className="font-bold text-slate-900">{s.value}</span>
+        </div>
+
+        {/* Right: Critical Continuity Risks & Priority Actions */}
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">Critical Continuity Risks</h3>
+              <p className="text-xs text-slate-500">Must be addressed prior to leaver departure</p>
+            </div>
+            <Link href="/dashboard/ledger" className="text-xs text-blue-600 hover:underline font-medium">
+              View Ledger →
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            {risks?.findings?.slice(0, 3).map((r: any) => (
+              <div key={r.id} className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-slate-900 leading-snug">{r.title}</span>
+                  <span className={`text-[10px] font-bold uppercase px-2 py-0.2 rounded border ${
+                    r.severity === "critical"
+                      ? "bg-rose-50 text-rose-700 border-rose-200"
+                      : "bg-amber-50 text-amber-700 border-amber-200"
+                  }`}>
+                    {r.severity}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600 leading-relaxed line-clamp-2">
+                  {r.description}
+                </p>
+                <div className="text-[11px] text-blue-700 font-medium">
+                  <span className="font-semibold">Mitigation: </span>{r.mitigation}
+                </div>
               </div>
             ))}
           </div>
         </div>
-
-        {/* Right: Knowledge Categories Breakdown (Bar Chart) */}
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="font-bold text-slate-900">Knowledge Reconstruction Categories</h3>
-              <p className="text-xs text-slate-500">Extracted domain items per category</p>
-            </div>
-            <Link href="/dashboard/evidence" className="text-xs font-semibold text-brand-blue flex items-center gap-1 hover:underline">
-              Inspect Evidence <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={categoryBarData} margin={{ top: 10, right: 10, left: -20, bottom: 25 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" angle={-35} textAnchor="end" interval={0} tick={{ fontSize: 10, fill: "#64748b" }} />
-                <YAxis tick={{ fontSize: 11, fill: "#64748b" }} />
-                <Tooltip />
-                <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
       </div>
 
-      {/* Recent Activity Feed */}
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs">
-        <div className="flex items-center justify-between mb-4">
+      {/* Recent Activity / Audit Trail Feed */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-brand-blue" />
-            <h3 className="font-bold text-slate-900">Live Append-Only Audit Trail</h3>
+            <Activity className="w-4 h-4 text-blue-600" />
+            <h3 className="text-sm font-bold text-slate-900">Recent Audit Trail</h3>
           </div>
-          <Link href="/dashboard/audit" className="text-xs font-semibold text-brand-blue hover:underline">
-            View All Audit Logs →
+          <Link href="/dashboard/security" className="text-xs font-semibold text-blue-600 hover:underline">
+            Security & Audit Center →
           </Link>
         </div>
-        <div className="divide-y divide-slate-100">
-          {(data?.recent_activity || []).map((act) => (
-            <div key={act.id} className="py-3 flex items-center justify-between text-xs">
+
+        <div className="divide-y divide-slate-100 text-xs">
+          {(data?.recent_activity || []).slice(0, 5).map((act) => (
+            <div key={act.id} className="py-2.5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-brand-blue" />
-                <div>
-                  <span className="font-semibold text-slate-800 capitalize">
-                    {act.action.replace(/_/g, " ")}
-                  </span>
-                  <span className="text-slate-400 mx-1.5">•</span>
-                  <span className="text-slate-600">{act.user}</span>
-                </div>
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                <span className="font-semibold text-slate-800 capitalize">
+                  {act.action.replace(/_/g, " ")}
+                </span>
+                <span className="text-slate-400">•</span>
+                <span className="text-slate-600">{act.user}</span>
               </div>
-              <div className="text-slate-400">{act.time}</div>
+              <span className="text-slate-400 font-mono text-[11px]">{act.time}</span>
             </div>
           ))}
         </div>

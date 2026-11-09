@@ -34,3 +34,4 @@ if (-not $feConn) {
 
 Write-Host "Opening BATON 2.0 in browser: http://localhost:3000 ..." -ForegroundColor Cyan
 Start-Process "http://localhost:3000"
+

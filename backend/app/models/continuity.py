@@ -154,3 +154,4 @@ class SourceReliabilityScore(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     source = relationship("Source", backref="reliability_metric")
+

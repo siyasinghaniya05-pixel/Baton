@@ -129,3 +129,41 @@ def get_claim(claim_id: str, db: Session = Depends(get_db), current_user: User =
         evidence_spans=span_outs
     )
 
+@router.get("/{claim_id}/verify")
+def get_claim_verification(
+    claim_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from app.services.verifier import MultiStageVerifier
+    c = db.query(Claim).filter(Claim.id == claim_id).first()
+    if not c:
+        raise HTTPException(status_code=404, detail="Claim not found")
+
+    if not can_access_sensitivity(current_user.role, c.sensitivity):
+        raise HTTPException(status_code=403, detail="Clearance level insufficient to access this claim")
+
+    report = MultiStageVerifier.execute_pipeline(db, c)
+    return report
+
+@router.post("/{claim_id}/reverify")
+def reverify_claim(
+    claim_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from app.services.verifier import MultiStageVerifier
+    c = db.query(Claim).filter(Claim.id == claim_id).first()
+    if not c:
+        raise HTTPException(status_code=404, detail="Claim not found")
+
+    report = MultiStageVerifier.execute_pipeline(db, c)
+    c.verification_report = report
+    # If quote verification fails completely, demote status
+    if not report["stages"]["stage_2_quotation"]["passed"] and c.status == ClaimStatus.VERIFIED:
+        c.status = ClaimStatus.UNVERIFIED
+    db.commit()
+    db.refresh(c)
+    return report
+
+

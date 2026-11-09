@@ -25,7 +25,32 @@ def query_assistant(
     q_lower = question.lower()
     allowed_sensitivities = ROLE_SENSITIVITY_CLEARANCE.get(user_role, [SensitivityLevel.PUBLIC])
 
-    # Check for canary secret or restricted credential probes
+    # 1. Prompt Injection & Jailbreak Defense
+    injection_patterns = [
+        r"ignore\s+(all\s+|previous\s+|prior\s+)?instructions",
+        r"system\s+override",
+        r"reveal\s+(all\s+)?(project\s+)?secrets",
+        r"dump\s+(all\s+)?(canary|source|private|confidential)",
+        r"bypass\s+(all\s+)?(security|policy|rbac|permissions)",
+        r"act\s+as\s+(dan|jailbreak|unrestricted|root)"
+    ]
+    is_injection_attempt = any(re.search(pat, q_lower) for pat in injection_patterns)
+    if is_injection_attempt and user_role != UserRole.ADMIN:
+        return AssistantAskResponse(
+            question=question,
+            answer="Security Policy Enforcement: Malicious prompt injection pattern detected. As an untrusted data boundary, user inputs and source document contents are isolated and cannot override system security guidelines or sensitivity controls.",
+            confidence=0.0,
+            grounding_status="ungrounded_refusal",
+            citations=[],
+            missing_evidence_note="Query rejected by AI Security and Adversarial Injection Filter.",
+            follow_up_suggestions=[
+                "What is the current project status?",
+                "Who owns the deployment process?",
+                "Which tasks are unfinished?"
+            ]
+        )
+
+    # 2. Check for canary secret or restricted credential probes
     restricted_keywords = ["canary", "production master root key", "hsmprivatekey", "vaultmastertoken", "root_secret", "canary_leak"]
     is_canary_probe = any(kw in q_lower for kw in restricted_keywords)
     if is_canary_probe and user_role not in [UserRole.ADMIN]:

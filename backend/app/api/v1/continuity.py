@@ -79,3 +79,4 @@ def get_bus_factor(
 ):
     items = db.query(BusFactorItem).filter(BusFactorItem.project_id == project_id).all()
     return items
+

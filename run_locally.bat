@@ -4,3 +4,4 @@ echo ==========================================================
 echo    BATON 2.0 - Starting Local Services
 echo ==========================================================
 powershell -ExecutionPolicy Bypass -File "%~dp0run_locally.ps1"
+

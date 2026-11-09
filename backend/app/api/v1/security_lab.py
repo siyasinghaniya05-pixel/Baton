@@ -15,3 +15,4 @@ def simulate_leak_tests(
     current_user: User = Depends(get_current_user)
 ):
     return run_security_simulation(db, project_id)
+

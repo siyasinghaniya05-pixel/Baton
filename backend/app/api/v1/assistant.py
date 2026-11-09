@@ -21,3 +21,4 @@ def ask_assistant(
         user_role=current_user.role,
         question=payload.question
     )
+

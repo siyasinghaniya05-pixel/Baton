@@ -15,3 +15,4 @@ def get_drift(
     current_user: User = Depends(get_current_user)
 ):
     return detect_knowledge_drift(db, project_id)
+

@@ -250,3 +250,4 @@ class SecuritySimulationResponse(BaseModel):
     leak_rate_percentage: float
     shield_status: str # SECURE / COMPLIANT / LEAK_DETECTED
     results: List[SecurityTestCase]
+

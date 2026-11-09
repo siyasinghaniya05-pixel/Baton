@@ -15,3 +15,4 @@ def get_graph(
     current_user: User = Depends(get_current_user)
 ):
     return generate_knowledge_graph(db, project_id)
+

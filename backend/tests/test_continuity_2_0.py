@@ -83,3 +83,4 @@ def test_drift_detector(db, demo_project):
     assert drift.total_drifts >= 3
     drift_types = set(d.drift_type for d in drift.items)
     assert "changed_decision" in drift_types
+

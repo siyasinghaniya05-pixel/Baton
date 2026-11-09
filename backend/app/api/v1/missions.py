@@ -49,3 +49,4 @@ def update_mission(
     db.commit()
     db.refresh(mission)
     return mission
+

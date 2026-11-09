@@ -60,3 +60,4 @@ def get_decision_detail(
     if not dec:
         raise HTTPException(status_code=404, detail="Decision record not found")
     return dec
+
